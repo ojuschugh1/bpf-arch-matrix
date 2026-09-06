@@ -1,0 +1,12 @@
+{
+  "id": "attach-fentry-vfs-read",
+  "title": "Attach an fentry (BTF-typed) program to vfs_read",
+  "category": "attachment",
+  "question": "Does this architecture and kernel support fentry attachment, which requires BPF trampolines?",
+  "pass_means": "BPF trampoline support is present, so fentry/fexit style programs work.",
+  "fail_means": "fentry attachment failed. BPF trampolines shipped on x86-64 in kernel 5.5 and on arm64 in 6.0, so older arm64 kernels are expected to fail this probe while x86-64 kernels of the same version pass. This is exactly the kind of divergence this project exists to record.",
+  "references": [
+    "https://docs.kernel.org/bpf/index.html",
+    "https://ebpf.io/what-is-ebpf/"
+  ]
+}

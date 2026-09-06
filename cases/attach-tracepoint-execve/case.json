@@ -1,0 +1,12 @@
+{
+  "id": "attach-tracepoint-execve",
+  "title": "Attach to tracepoint:syscalls:sys_enter_execve and observe an exec",
+  "category": "attachment",
+  "question": "Can a program attach to the execve syscall tracepoint on this architecture and actually see an exec event?",
+  "pass_means": "The native execve tracepoint exists, accepts attachment, and fires. Note this only covers native-width syscalls: on arm64, 32-bit compat processes take a different syscall path that this tracepoint does not see.",
+  "fail_means": "Attachment failed or no event was observed for a process this probe itself executed.",
+  "references": [
+    "https://inspektor-gadget.io/blog/2022/09/porting-an-ebpf-based-application-to-arm64-our-experience-with-inspektor-gadget",
+    "https://github.com/iovisor/bcc/issues/3668"
+  ]
+}

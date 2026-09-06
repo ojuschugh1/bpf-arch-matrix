@@ -1,0 +1,11 @@
+{
+  "id": "attach-rawtracepoint-sys-enter",
+  "title": "Attach a raw tracepoint to sys_enter",
+  "category": "attachment",
+  "question": "Can a raw tracepoint attach on this architecture, giving untyped access to syscall entry?",
+  "pass_means": "Raw tracepoint attachment works, the common fallback when typed tracepoints or trampolines are unavailable.",
+  "fail_means": "Raw tracepoint attachment failed on this kernel.",
+  "references": [
+    "https://docs.kernel.org/trace/events.html"
+  ]
+}

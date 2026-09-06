@@ -1,0 +1,11 @@
+{
+  "id": "baseline-btf-vmlinux",
+  "title": "Kernel exposes BTF at /sys/kernel/btf/vmlinux",
+  "category": "baseline",
+  "question": "Does this kernel ship BTF type information, the baseline for CO-RE and for typed probes?",
+  "pass_means": "BTF is present and readable, so CO-RE relocation and fentry-style typed attachment are possible in principle.",
+  "fail_means": "The kernel was built without CONFIG_DEBUG_INFO_BTF. CO-RE programs need an external BTF source here.",
+  "references": [
+    "https://docs.kernel.org/bpf/btf.html"
+  ]
+}

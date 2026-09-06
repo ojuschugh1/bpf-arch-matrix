@@ -1,0 +1,12 @@
+{
+  "id": "attach-kprobe-vfs-read",
+  "title": "Attach a kprobe to vfs_read",
+  "category": "attachment",
+  "question": "Can a kprobe attach to a common kernel function on this architecture and kernel configuration?",
+  "pass_means": "Dynamic kernel function probing works here.",
+  "fail_means": "kprobe attachment failed. Known real-world causes include kernel configurations that forbid modifying kernel text, reported on some arm64 systems.",
+  "references": [
+    "https://github.com/kubeshield/bpf-opa-demo/issues/6",
+    "https://tetragon.io/docs/concepts/tracing-policy/hooks/"
+  ]
+}

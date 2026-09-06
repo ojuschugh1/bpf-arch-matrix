@@ -1,0 +1,12 @@
+{
+  "id": "toolchain-arch-define-required",
+  "title": "bpf_tracing.h requires __TARGET_ARCH_* for register access",
+  "category": "toolchain",
+  "question": "Does reading syscall or function arguments through PT_REGS require an explicit per-architecture define, forcing per-arch object files?",
+  "pass_means": "Compilation fails without __TARGET_ARCH_* and succeeds with the correct one for this machine. One BPF object per architecture is required for programs that touch registers.",
+  "fail_means": "Either the header compiled without an arch define, or the correct define did not compile. Both would contradict the documented libbpf behaviour and deserve investigation.",
+  "references": [
+    "https://github.com/libbpf/libbpf/blob/master/src/bpf_tracing.h",
+    "https://inspektor-gadget.io/blog/2022/09/porting-an-ebpf-based-application-to-arm64-our-experience-with-inspektor-gadget"
+  ]
+}

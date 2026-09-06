@@ -1,0 +1,5 @@
+results/
+matrix.md
+matrix.json
+__pycache__/
+*.o

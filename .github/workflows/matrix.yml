@@ -1,0 +1,69 @@
+name: matrix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, ubuntu-22.04, ubuntu-22.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bpftrace clang libbpf-dev linux-tools-common
+          sudo apt-get install -y "linux-tools-$(uname -r)" \
+            || sudo apt-get install -y linux-tools-azure \
+            || sudo apt-get install -y linux-tools-generic \
+            || true
+
+      - name: Show environment
+        run: |
+          uname -a
+          bpftrace --version || true
+          clang --version | head -1
+
+      - name: Run probes
+        run: sudo -E python3 runner/run.py --label "${{ matrix.runner }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.runner }}
+          path: results/*.json
+          if-no-files-found: error
+
+  combine:
+    needs: probe
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          merge-multiple: true
+          path: results
+
+      - name: Combine into matrix
+        run: python3 runner/combine.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: matrix
+          path: |
+            matrix.md
+            matrix.json
