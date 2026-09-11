@@ -2,6 +2,7 @@
 
 A cross-architecture portability test suite for eBPF. Small, single-purpose probe programs run on both x86-64 and arm64 in CI, and the results are published as a compatibility matrix where every row says how it was established.
 
+
 The eBPF instruction set is architecture independent, but eBPF programs are not. Syscall arguments arrive in different registers per architecture, which is why `bpf_tracing.h` needs a `__TARGET_ARCH_*` define and per-arch object files. Attachment types became available at different times on different architectures. On an arm64 kernel, a 32-bit process makes compat syscalls that native tracepoints never see. These differences are documented in scattered blog posts and issue threads. This repository turns them into checks that run continuously and produce answers you can link to.
 
 ## How it works
