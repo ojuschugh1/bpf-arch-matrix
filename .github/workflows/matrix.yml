@@ -21,19 +21,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tooling
+      - name: Install pinned tooling
         run: |
           sudo apt-get update
-          sudo apt-get install -y bpftrace clang libbpf-dev linux-tools-common
-          sudo apt-get install -y "linux-tools-$(uname -r)" \
-            || sudo apt-get install -y linux-tools-azure \
-            || sudo apt-get install -y linux-tools-generic \
-            || true
+          sudo apt-get install -y clang libbpf-dev
+          case "$(uname -m)" in
+            x86_64)  bt=bpftrace-x86_64; bpftool_arch=amd64 ;;
+            aarch64) bt=bpftrace-aarch64; bpftool_arch=arm64 ;;
+          esac
+          curl -sL -o /tmp/bpftrace "https://github.com/bpftrace/bpftrace/releases/download/v${BPFTRACE_VERSION}/$bt"
+          sudo install -m 0755 /tmp/bpftrace /usr/local/bin/bpftrace
+          curl -sL "https://github.com/libbpf/bpftool/releases/download/v${BPFTOOL_VERSION}/bpftool-v${BPFTOOL_VERSION}-${bpftool_arch}.tar.gz" | tar -xz -C /tmp
+          sudo install -m 0755 /tmp/bpftool /usr/local/bin/bpftool
+        env:
+          BPFTRACE_VERSION: 0.27.0
+          BPFTOOL_VERSION: 7.7.0
 
       - name: Show environment
         run: |
           uname -a
-          bpftrace --version || true
+          sudo bpftrace --version
+          bpftool version
           clang --version | head -1
 
       - name: Run probes

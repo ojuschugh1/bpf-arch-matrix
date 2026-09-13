@@ -27,7 +27,7 @@ The runner (`runner/run.py`, Python standard library only) executes every case, 
 | baseline-btf-vmlinux | does the kernel expose BTF at /sys/kernel/btf/vmlinux (CO-RE baseline) |
 | toolchain-arch-define-required | does bpf_tracing.h refuse PT_REGS access without __TARGET_ARCH_*, and accept the correct define |
 
-One expectation worth stating up front: fentry requires BPF trampoline support, which x86-64 gained in kernel 5.5 and arm64 only in 6.0. So 5.15-era arm64 kernels (Ubuntu 22.04) should fail that probe while 5.15 x86-64 passes. The matrix will tell us.
+One expectation worth stating up front: fentry requires BPF trampoline support, which x86-64 gained in kernel 5.5 and arm64 only in 6.0. On a 5.15 kernel the fentry probe should fail on arm64 and pass on x86-64. Whether the matrix ever shows that depends on which kernels the runner images carry; today they all run 6.x, so reaching a 5.15 kernel needs the VM-based tooling on the roadmap.
 
 ## Provenance rules
 
@@ -42,12 +42,16 @@ The two are never mixed in a cell. A portability reference that blurs measuremen
 
 GitHub-hosted runners, all free for public repositories:
 
-- `ubuntu-24.04` (x86-64, 6.8-era kernel)
-- `ubuntu-24.04-arm` (arm64, 6.8-era kernel)
-- `ubuntu-22.04` (x86-64, 5.15-era kernel)
-- `ubuntu-22.04-arm` (arm64, 5.15-era kernel)
+- `ubuntu-24.04` and `ubuntu-24.04-arm`
+- `ubuntu-22.04` and `ubuntu-22.04-arm`
+
+The kernel on each runner is whatever the image ships that week (recorded in every result), so the 22.04 and 24.04 images are two kernel generations only when GitHub's images happen to differ. Check the `kernel` field in the results before reading a row as a kernel difference.
 
 Runs happen on push, on pull requests, weekly on a schedule so the matrix tracks runner kernel updates, and on demand.
+
+## Tooling is pinned, on purpose
+
+Every runner installs the same bpftrace and bpftool release binaries instead of the distro packages. The first run of this matrix reported fentry and raw tracepoint failures on both 22.04 runners that turned out to be Ubuntu 22.04's bpftrace 0.14 not understanding the probe syntax, on a kernel that supported both. That is a tooling difference wearing a kernel difference's clothes, and it is exactly the kind of blur this project exists to avoid. With the same tool versions everywhere, a differing cell means the kernel or the architecture differs, not the package manager.
 
 ## Running locally
 
