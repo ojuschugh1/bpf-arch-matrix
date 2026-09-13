@@ -30,8 +30,14 @@ jobs:
             x86_64)  bt=bpftrace-x86_64; bpftool_arch=amd64 ;;
             aarch64) bt=bpftrace-aarch64; bpftool_arch=arm64 ;;
           esac
-          curl -sL -o /tmp/bpftrace "https://github.com/bpftrace/bpftrace/releases/download/v${BPFTRACE_VERSION}/$bt"
-          sudo install -m 0755 /tmp/bpftrace /usr/local/bin/bpftrace
+          curl -sL -o /tmp/bpftrace.AppImage "https://github.com/bpftrace/bpftrace/releases/download/v${BPFTRACE_VERSION}/$bt"
+          chmod +x /tmp/bpftrace.AppImage
+          (cd /tmp && ./bpftrace.AppImage --appimage-extract > /dev/null)
+          sudo rm -rf /opt/bpftrace && sudo mv /tmp/squashfs-root /opt/bpftrace
+          entry=/opt/bpftrace/AppRun
+          [ -x "$entry" ] || entry=$(find /opt/bpftrace -type f -name bpftrace -perm -u+x | head -1)
+          printf '#!/bin/sh\nexec %s "$@"\n' "$entry" | sudo tee /usr/local/bin/bpftrace > /dev/null
+          sudo chmod 0755 /usr/local/bin/bpftrace
           curl -sL "https://github.com/libbpf/bpftool/releases/download/v${BPFTOOL_VERSION}/bpftool-v${BPFTOOL_VERSION}-${bpftool_arch}.tar.gz" | tar -xz -C /tmp
           sudo install -m 0755 /tmp/bpftool /usr/local/bin/bpftool
         env:
