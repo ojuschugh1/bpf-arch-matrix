@@ -25,6 +25,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang libbpf-dev
+          sudo apt-get install -y libfuse2t64 || sudo apt-get install -y libfuse2
           case "$(uname -m)" in
             x86_64)  bt=bpftrace-x86_64; bpftool_arch=amd64 ;;
             aarch64) bt=bpftrace-aarch64; bpftool_arch=arm64 ;;
